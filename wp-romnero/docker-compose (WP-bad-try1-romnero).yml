@@ -1,0 +1,30 @@
+version: '3.5'
+services:
+  wordpress:
+    image: wordpress
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: user1
+      WORDPRESS_DB_PASSWORD: pass123
+      WORDPRESS_DB_NAME: testdb
+    volumes:
+      - wordpress:/var/www/html
+
+  db:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: user1
+      MYSQL_PASSWORD: pass123
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  wordpress:
+  db:

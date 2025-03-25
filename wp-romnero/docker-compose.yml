@@ -1,0 +1,47 @@
+version: '3.5'
+# я дал nginx с конфигом камк у павленко и версию wp как у него (wordpress:5.7.0-php8.0-fpm вместо 6.1-php7.4). оставил старый mysql:5.7
+# а еще дал сеть ка у павленко (pavlenko-app-cut: driver: bridge). но оставил порты для wp (не для nginx) ports: 8080:80 - fail
+# убрал порт к wp - оставил только у nginx - fail
+# меняю mysql:5.7 на более новую от павленко mysql:8.0 - Error establishing a database connection
+services:
+  wordpress:
+    # romnero logs: Apache/2.4.54 (Debian) PHP/7.4.32
+    # image: wordpress:6.1-php7.4-fpm - no access
+    # image: wordpress:php7.4-apache - (log: Apache/2.4.54 (Debian) PHP/7.4.33) Error establishing a database connection - это показывалось только из-за apache ?
+      # вывод: здесь за доступность отвечает версия WP. но полностью не работает то ли из-за отсутствия nginx, то ли из-за сети (маловероятно, пушто я ее делал)
+      # а не версия compose файла, комбинация портов, переменные в env, опции restart и depends_on
+    image: wordpress
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: user1
+      WORDPRESS_DB_PASSWORD: pass123
+      WORDPRESS_DB_NAME: testdb
+    volumes:
+      - wordpress:/var/www/html
+    # my
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: user1
+      MYSQL_PASSWORD: pass123
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  wordpress:
+  db:
+
+# теперь беру версию павленко и откатываю до romnero для проверки что падает
+# поставил mysql:5.7 - Error establishing a database connection
+# убрал networks: pavlenko-app: driver: bridge - запустилось
+# поставил напрямую к wp ports: "8080:80" - все работает, но по 8080 не достучаться напрямую
+# замена 5.7.0-php8.0-fpm на 5.7.0-php8.0-apache - fail : 502 Bad Gateway
