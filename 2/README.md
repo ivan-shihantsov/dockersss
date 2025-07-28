@@ -1,10 +1,23 @@
 ## WordPress + MySQL
 
-Run this with:<br>
-`docker compose -f compose-1.yaml up -d`<br>
+### try 1: only mysql + wordpress
 
-AND for this case do the following after use (clean with volumes)<br>
-`docker compose -f compose-1.yaml down -v`<br>
+```
+cd 1
+docker compose up -d
+```
+and open wordpress localhost:8080<br>
 
 
-And then open in browser: 127.0.0.1:80<br>
+### try 2: mysql + wordpress + phpmyadmin + new network
+
+```
+cd 2
+docker compose up -d
+```
+and open wordpress on localhost:8080<br>
+then open phpmyadmin on localhost:8081<br>
+* mysql user: user1
+* mysql pass: pass123
+
+

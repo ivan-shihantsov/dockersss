@@ -1,0 +1,48 @@
+services:
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: wpdb
+      MYSQL_USER: user1
+      MYSQL_PASSWORD: pass123
+      MYSQL_ROOT_PASSWORD: rootpass000
+    volumes:
+      - mydbv:/var/lib/mysql
+    networks:
+      - my-app
+
+  wordpress:
+    image: wordpress
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: user1
+      WORDPRESS_DB_PASSWORD: pass123
+      WORDPRESS_DB_NAME: wpdb
+    volumes:
+      - myhtmlv:/var/www/html
+    networks:
+      - my-app
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - db
+    ports:
+      - 8081:80
+    networks:
+      - my-app
+
+volumes:
+  myhtmlv:
+  mydbv:
+
+networks:
+  my-app:
+    driver: bridge
