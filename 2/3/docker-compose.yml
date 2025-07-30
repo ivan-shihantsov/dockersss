@@ -1,0 +1,59 @@
+services:
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: wpdb
+      MYSQL_USER: user1
+      MYSQL_PASSWORD_FILE: /run/secrets/db_password
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+    secrets:
+      - db_password
+      - db_root_password
+    volumes:
+      - mydbv:/var/lib/mysql
+    networks:
+      - my-app
+
+  wordpress:
+    image: wordpress
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: user1
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/db_password
+      WORDPRESS_DB_NAME: wpdb
+    secrets: 
+      - db_password
+    volumes:
+      - myhtmlv:/var/www/html
+    networks:
+      - my-app
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - db
+    ports:
+      - 8081:80
+    networks:
+      - my-app
+
+secrets:
+  db_password:
+    file: ./db_password.txt
+  db_root_password:
+    file: ./db_root_password.txt
+
+volumes:
+  myhtmlv:
+  mydbv:
+
+networks:
+  my-app:
+    driver: bridge
